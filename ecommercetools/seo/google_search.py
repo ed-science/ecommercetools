@@ -48,9 +48,7 @@ def _get_site_results(url: str):
 
     try:
         query = urllib.parse.quote_plus(url)
-        response = _get_source("https://www.google.co.uk/search?q=site%3A" + query)
-
-        return response
+        return _get_source("https://www.google.co.uk/search?q=site%3A" + query)
     except requests.exceptions.RequestException as e:
         print(e)
 
@@ -68,8 +66,7 @@ def _parse_site_results(response: str):
     try:
         if response.html.find("#result-stats", first=True):
 
-            string = response.html.find("#result-stats", first=True).text
-            if string:
+            if string := response.html.find("#result-stats", first=True).text:
                 # Remove values in paretheses, i.e. (0.31 seconds)
                 string = re.sub(r'\([^)]*\)', '', string)
 
@@ -127,9 +124,7 @@ def _get_results(query: str):
     """
 
     query = urllib.parse.quote_plus(query)
-    response = _get_source("https://www.google.co.uk/search?q=" + query)
-
-    return response
+    return _get_source("https://www.google.co.uk/search?q=" + query)
 
 
 def _get_next_page(response, domain="google.co.uk"):
@@ -137,9 +132,7 @@ def _get_next_page(response, domain="google.co.uk"):
 
     css_identifier_next = "#pnnext"
     next_page_url = response.html.find(css_identifier_next, first=True).attrs['href']
-    next_page = "https://www." + domain + next_page_url
-
-    return next_page
+    return "https://www." + domain + next_page_url
 
 
 def _parse_search_results(response):
@@ -235,10 +228,9 @@ def get_serps(query: str,
         page += 1
 
     if results:
-        if output == "dataframe":
-            df = pd.DataFrame.from_records(results)
-            df.index = np.arange(1, len(df) + 1)
-            df.index.names = ['position']
-            return df.reset_index()
-        else:
+        if output != "dataframe":
             return results
+        df = pd.DataFrame.from_records(results)
+        df.index = np.arange(1, len(df) + 1)
+        df.index.names = ['position']
+        return df.reset_index()

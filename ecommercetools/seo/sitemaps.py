@@ -18,10 +18,12 @@ def _get_xml(url: str):
 
     try:
         response = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla'}))
-        xml = BeautifulSoup(response,
-                            'lxml-xml',
-                            from_encoding=response.info().get_param('charset'))
-        return xml
+        return BeautifulSoup(
+            response,
+            'lxml-xml',
+            from_encoding=response.info().get_param('charset'),
+        )
+
     except Exception as e:
         print("Error: ", e)
 
@@ -58,11 +60,7 @@ def _get_child_sitemaps(xml: str):
     """
 
     sitemaps = xml.find_all("sitemap")
-    output = []
-
-    for sitemap in sitemaps:
-        output.append(sitemap.findNext("loc").text)
-    return output
+    return [sitemap.findNext("loc").text for sitemap in sitemaps]
 
 
 def _sitemap_to_dataframe(xml: str, name=None, verbose=False):
@@ -91,21 +89,9 @@ def _sitemap_to_dataframe(xml: str, name=None, verbose=False):
             loc = ''
             domain = ''
 
-        if xml.find("changefreq"):
-            changefreq = url.findNext("changefreq").text
-        else:
-            changefreq = ''
-
-        if xml.find("priority"):
-            priority = url.findNext("priority").text
-        else:
-            priority = ''
-
-        if name:
-            sitemap_name = name
-        else:
-            sitemap_name = ''
-
+        changefreq = url.findNext("changefreq").text if xml.find("changefreq") else ''
+        priority = url.findNext("priority").text if xml.find("priority") else ''
+        sitemap_name = name or ''
         row = {
             'domain': domain,
             'loc': loc,
@@ -132,8 +118,7 @@ def get_sitemap(url: str):
 
     """
 
-    xml = _get_xml(url)
-    if xml:
+    if xml := _get_xml(url):
         sitemap_type = _get_sitemap_type(xml)
 
         if sitemap_type =='sitemapindex':

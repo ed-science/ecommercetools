@@ -315,11 +315,8 @@ def _latency_label_customers(avg_latency, std_latency, recency):
     elif (recency <= days_to_next_order_lower) or (recency <= days_to_next_order_upper):
         return 'Order due soon'
 
-    elif recency > days_to_next_order_upper:
-        return 'Order overdue'
-
     else:
-        return 'Not sure'
+        return 'Order overdue'
 
 
 def get_latency(df_transactions):
@@ -406,12 +403,13 @@ def _get_lifetimes_rfmt(df_transactions, observation_period_end):
 
     df_transactions = df_transactions[df_transactions['replacement'] == 0]
 
-    df = summary_data_from_transaction_data(df_transactions,
-                                            'customer_id',
-                                            'order_date',
-                                            'revenue',
-                                            observation_period_end=observation_period_end)
-    return df
+    return summary_data_from_transaction_data(
+        df_transactions,
+        'customer_id',
+        'order_date',
+        'revenue',
+        observation_period_end=observation_period_end,
+    )
 
 
 def _get_predicted_purchases(df_transactions,
@@ -466,9 +464,7 @@ def _get_predicted_aov(df_transactions,
         df_returning['monetary_value']
     )
 
-    aov_df = pd.DataFrame(predicted_monetary, columns=['aov'])
-
-    return aov_df
+    return pd.DataFrame(predicted_monetary, columns=['aov'])
 
 
 def _get_predicted_clv(df_transactions,
@@ -505,17 +501,19 @@ def _get_predicted_clv(df_transactions,
             df_returning['recency'],
             df_returning['T'])
 
-    preds = ggf.customer_lifetime_value(
-        bgf,
-        df_returning['frequency'],
-        df_returning['recency'],
-        df_returning['T'],
-        df_returning['monetary_value'],
-        time=months,
-        discount_rate=discount_rate
-    ).to_frame().reset_index()
-
-    return preds
+    return (
+        ggf.customer_lifetime_value(
+            bgf,
+            df_returning['frequency'],
+            df_returning['recency'],
+            df_returning['T'],
+            df_returning['monetary_value'],
+            time=months,
+            discount_rate=discount_rate,
+        )
+        .to_frame()
+        .reset_index()
+    )
 
 
 def get_customer_predictions(df_transactions,

@@ -23,9 +23,7 @@ def get_summary(text,
                          min_length=min_length,
                          max_length=max_length,
                          do_sample=do_sample)
-    summary_text = summary[0]['summary_text'].strip().replace(' .', '.')
-
-    return summary_text
+    return summary[0]['summary_text'].strip().replace(' .', '.')
 
 
 def get_summaries(df,

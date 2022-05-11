@@ -20,8 +20,7 @@ def _get_source(url: str):
 
     try:
         session = HTMLSession()
-        response = session.get(url)
-        return response
+        return session.get(url)
 
     except requests.exceptions.RequestException as e:
         print(e)
@@ -127,10 +126,7 @@ def _get_paragraphs(response):
     """
 
     try:
-        paragraphs = []
-        for paragraph in response.html.find('p'):
-            paragraphs.append(paragraph.text)
-        return paragraphs
+        return [paragraph.text for paragraph in response.html.find('p')]
     except Exception as e:
         return
 
@@ -152,7 +148,10 @@ def scrape_site(df, url='loc', verbose=False):
         pages = len(df)
         minutes = pages / 60
 
-        print('Preparing to scrape ' + str(pages) + ' pages. This will take approximately ' + str(round(minutes)) + ' minutes')
+        print(
+            f'Preparing to scrape {pages} pages. This will take approximately {str(round(minutes))} minutes'
+        )
+
 
     df_pages = pd.DataFrame(columns=['url', 'title', 'description', 'canonical', 'robots', 'hreflang', 'generator',
                                      'absolute_links', 'paragraphs'])
@@ -162,9 +161,7 @@ def scrape_site(df, url='loc', verbose=False):
         if verbose:
             print('Scraping: ' + row[url])
 
-        response = _get_source(row[url])
-
-        if response:
+        if response := _get_source(row[url]):
             with response as r:
                 row = {
                     'url': row[url],

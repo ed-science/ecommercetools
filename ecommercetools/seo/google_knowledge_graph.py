@@ -17,8 +17,7 @@ def _get_source(url: str):
 
     try:
         session = HTMLSession()
-        response = session.get(url)
-        return response
+        return session.get(url)
 
     except requests.exceptions.RequestException as e:
         print(e)
@@ -46,7 +45,7 @@ def get_knowledge_graph(api_key: str,
         'key': api_key,
     }
 
-    url = endpoint + '?' + urllib.parse.urlencode(params)
+    url = f'{endpoint}?' + urllib.parse.urlencode(params)
     response = _get_source(url)
 
     if output == "json":

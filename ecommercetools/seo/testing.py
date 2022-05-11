@@ -184,8 +184,5 @@ def seo_test(key,
     # Get the dates of the pre- and post-periods
     pre_period, post_period = _get_pre_and_post_periods(post_period_start_date, days)
 
-    # Fit the test model
-    model = CausalImpact(df[metric], pre_period, post_period)
-
-    return model
+    return CausalImpact(df[metric], pre_period, post_period)
 

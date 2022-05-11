@@ -21,8 +21,7 @@ def _get_source(url: str):
 
     try:
         session = HTMLSession()
-        response = session.get(url)
-        return response
+        return session.get(url)
     except requests.exceptions.RequestException as e:
         print(e)
 
@@ -68,10 +67,9 @@ def get_robots(url: str):
     lines = str(robots).splitlines()
     for line in lines:
 
-        if line.strip():
-            if not line.startswith('#'):
-                split = line.split(':', maxsplit=1)
-                data.append([split[0].strip(), split[1].strip()])
+        if line.strip() and not line.startswith('#'):
+            split = line.split(':', maxsplit=1)
+            data.append([split[0].strip(), split[1].strip()])
 
     return pd.DataFrame(data, columns=['directive', 'parameter'])
 

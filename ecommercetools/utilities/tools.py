@@ -156,6 +156,6 @@ def select_last_x_days(df,
         df (object): Filtered dataframe containing only records from the past X days.
     """
 
-    subtracted_date = date_subtract(datetime.today(), days)
+    subtracted_date = date_subtract(datetime.now(), days)
     df = df[df[date_column] >= subtracted_date]
     return df

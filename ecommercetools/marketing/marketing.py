@@ -51,8 +51,7 @@ def _get_dates(start_date, days=365):
     """
 
     period = pd.date_range(start_date, periods=days, freq='D')
-    df = pd.DataFrame({'date': period})
-    return df
+    return pd.DataFrame({'date': period})
 
 
 def get_trading_events(start_date, days=365):
@@ -92,5 +91,4 @@ def get_trading_calendar(start_date, days=365):
     dates = _get_dates(start_date, days)
     events = get_trading_events(start_date, days)
 
-    calendar = dates.merge(events, on='date', how='left').fillna('')
-    return calendar
+    return dates.merge(events, on='date', how='left').fillna('')
