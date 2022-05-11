@@ -21,8 +21,7 @@ def _get_source(url: str):
 
     try:
         session = HTMLSession()
-        response = session.get(url)
-        return response
+        return session.get(url)
     except requests.exceptions.RequestException as e:
         print(e)
 
@@ -39,8 +38,7 @@ def _get_results(query: str):
 
     query = urllib.parse.quote_plus(query)
     response = _get_source("https://suggestqueries.google.com/complete/search?output=chrome&hl=en&q=" + query)
-    results = json.loads(response.text)
-    return results
+    return json.loads(response.text)
 
 
 def _format_results(results: dict):
@@ -84,9 +82,34 @@ def _get_expanded_term_suffixes():
         expanded_term_suffixes (list)
     """
 
-    expanded_term_suffixes = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                              'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-    return expanded_term_suffixes
+    return [
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+        'h',
+        'i',
+        'j',
+        'k',
+        'l',
+        'm',
+        'n',
+        'o',
+        'p',
+        'q',
+        'r',
+        's',
+        't',
+        'u',
+        'v',
+        'w',
+        'x',
+        'y',
+        'z',
+    ]
 
 
 def _get_expanded_term_prefixes():
@@ -96,10 +119,23 @@ def _get_expanded_term_prefixes():
         expanded_term_prefixes (list)
     """
 
-    expanded_term_prefixes = ['who is *', 'what is *', 'where is *', 'when can *', 'why is *',
-                              'how to *', 'best', 'cheap', 'worst', 'is', 'what', 'when', 'why',
-                              'how', 'who']
-    return expanded_term_prefixes
+    return [
+        'who is *',
+        'what is *',
+        'where is *',
+        'when can *',
+        'why is *',
+        'how to *',
+        'best',
+        'cheap',
+        'worst',
+        'is',
+        'what',
+        'when',
+        'why',
+        'how',
+        'who',
+    ]
 
 
 def _get_expanded_terms(query: str):
@@ -117,12 +153,8 @@ def _get_expanded_terms(query: str):
 
     terms = [query]
 
-    for term in expanded_term_prefixes:
-        terms.append(term + ' ' + query)
-
-    for term in expanded_term_suffixes:
-        terms.append(query + ' ' + term)
-
+    terms.extend(term + ' ' + query for term in expanded_term_prefixes)
+    terms.extend(f'{query} ' + term for term in expanded_term_suffixes)
     return terms
 
 
@@ -164,6 +196,5 @@ def google_autocomplete(query: str, include_expanded=True):
     else:
         results = _get_suggestions(query)
 
-    df = pd.DataFrame.from_records(results)
-    return df
+    return pd.DataFrame.from_records(results)
 

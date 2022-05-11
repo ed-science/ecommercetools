@@ -5,10 +5,7 @@ import pandas as pd
 
 
 def _match_type_exact(keywords):
-    exact = []
-    for keyword in keywords:
-        exact.append([keyword[0], '[' + keyword[1] + ']'])
-
+    exact = [[keyword[0], '[' + keyword[1] + ']'] for keyword in keywords]
     df = pd.DataFrame.from_records(exact, columns=['product', 'keywords'])
     df['match_type'] = 'Exact'
 
@@ -16,10 +13,7 @@ def _match_type_exact(keywords):
 
 
 def _match_type_phrase(keywords):
-    phrase = []
-    for keyword in keywords:
-        phrase.append([keyword[0], '"' + keyword[1] + '"'])
-
+    phrase = [[keyword[0], '"' + keyword[1] + '"'] for keyword in keywords]
     df = pd.DataFrame.from_records(phrase, columns=['product', 'keywords'])
     df['match_type'] = 'Phrase'
 
@@ -27,10 +21,7 @@ def _match_type_phrase(keywords):
 
 
 def _match_type_broad(keywords):
-    broad = []
-    for keyword in keywords:
-        broad.append([keyword[0], keyword[1]])
-
+    broad = [[keyword[0], keyword[1]] for keyword in keywords]
     df = pd.DataFrame.from_records(broad, columns=['product', 'keywords'])
     df['match_type'] = 'Broad'
 
@@ -73,11 +64,15 @@ def _generate_combinations(products,
     for product in products:
         keywords.append([product, product])
 
-        for keyword_prepend in keywords_prepend:
-            keywords.append([product, keyword_prepend + ' ' + product])
+        keywords.extend(
+            [product, keyword_prepend + ' ' + product]
+            for keyword_prepend in keywords_prepend
+        )
 
-        for keyword_append in keywords_append:
-            keywords.append([product, product + ' ' + keyword_append])
+        keywords.extend(
+            [product, product + ' ' + keyword_append]
+            for keyword_append in keywords_append
+        )
 
     return keywords
 
@@ -125,9 +120,7 @@ def generate_spintax(text, single=True):
     chunks = pattern.split(text)
 
     def options(s):
-        if len(s) > 0 and s[0] == '{':
-            return [opt for opt in s[1:-1].split('|')]
-        return [s]
+        return list(s[1:-1].split('|')) if len(s) > 0 and s[0] == '{' else [s]
 
     parts_list = [options(chunk) for chunk in chunks]
 

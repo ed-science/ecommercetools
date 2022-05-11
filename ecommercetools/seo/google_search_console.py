@@ -21,9 +21,7 @@ def _connect(key: str):
     try:
         scope = ['https://www.googleapis.com/auth/webmasters']
         credentials = service_account.Credentials.from_service_account_file(key, scopes=scope)
-        service = build('webmasters', 'v3', credentials=credentials)
-
-        return service
+        return build('webmasters', 'v3', credentials=credentials)
 
     except Exception as e:
         print("Error: ", e)
@@ -70,10 +68,11 @@ def _get_results(service, site_url, payload, results):
 
     try:
         for row in response['rows']:
-            data = {}
+            data = {
+                payload['dimensions'][i]: row['keys'][i]
+                for i in range(len(payload['dimensions']))
+            }
 
-            for i in range(len(payload['dimensions'])):
-                data[payload['dimensions'][i]] = row['keys'][i]
 
             data['clicks'] = row['clicks']
             data['impressions'] = row['impressions']
@@ -162,8 +161,8 @@ def query_google_search_console_compare(key, site_url, payload_before, payload_a
         # Fetch the data and prefix the column names with _before and _after
         df_before = query_google_search_console(key, site_url, payload_before, fetch_all=fetch_all)
         df_after = query_google_search_console(key, site_url, payload_after, fetch_all=fetch_all)
-        df_before.columns = [str(col) + '_before' for col in df_before.columns]
-        df_after.columns = [str(col) + '_after' for col in df_after.columns]
+        df_before.columns = [f'{str(col)}_before' for col in df_before.columns]
+        df_after.columns = [f'{str(col)}_after' for col in df_after.columns]
 
         # Extract the dimensions from the payload, remove date and append _before and _after and join data
         dimensions_before = [dimension + '_before' for dimension in payload_before['dimensions']]

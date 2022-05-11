@@ -29,8 +29,7 @@ def query_core_web_vitals(key: str,
                    + "&key=" + key
 
         response = urllib.request.urlopen(endpoint.format(url)).read().decode('UTF-8')
-        data = json.loads(response)
-        return data
+        return json.loads(response)
     except Exception as e:
         print("Error: ", e)
         sys.exit(1)
@@ -74,7 +73,7 @@ def parse_core_web_vitals(report: dict):
     total_blocking_time = report["lighthouseResult"]["audits"]["total-blocking-time"]["score"] * 100
     cumulative_layout_shift = report["lighthouseResult"]["audits"]["cumulative-layout-shift"]["score"] * 100
 
-    data = {
+    return {
         'final_url': final_url,
         'fetch_time': fetch_time,
         'form_factor': form_factor,
@@ -86,8 +85,6 @@ def parse_core_web_vitals(report: dict):
         'total_blocking_time': total_blocking_time,
         'cumulative_layout_shift': cumulative_layout_shift,
     }
-
-    return data
 
 
 def get_core_web_vitals(key: str,
@@ -111,21 +108,18 @@ def get_core_web_vitals(key: str,
     if strategy == "both":
 
         for url in urls:
-            report = query_core_web_vitals(key, url, strategy="mobile")
-            if report:
+            if report := query_core_web_vitals(key, url, strategy="mobile"):
                 data = parse_core_web_vitals(report)
                 df = df.append(data, ignore_index=True)
 
         for url in urls:
-            report = query_core_web_vitals(key, url, strategy="desktop")
-            if report:
+            if report := query_core_web_vitals(key, url, strategy="desktop"):
                 data = parse_core_web_vitals(report)
                 df = df.append(data, ignore_index=True)
 
     else:
         for url in urls:
-            report = query_core_web_vitals(key, url, strategy=strategy)
-            if report:
+            if report := query_core_web_vitals(key, url, strategy=strategy):
                 data = parse_core_web_vitals(report)
                 df = df.append(data, ignore_index=True)
 

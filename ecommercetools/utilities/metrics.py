@@ -756,9 +756,7 @@ def time_to_resolve(time_received, time_resolved):
 
     time_received = datetime.strptime(time_received, "%Y-%m-%d %H:%M:%S")
     time_resolved = datetime.strptime(time_resolved, "%Y-%m-%d %H:%M:%S")
-    time_to_resolve = ((time_resolved - time_received).seconds / 60) / 60
-
-    return time_to_resolve
+    return ((time_resolved - time_received).seconds / 60) / 60
 
 
 
